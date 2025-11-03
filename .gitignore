@@ -1,0 +1,29 @@
+# Deno
+.deno/
+deno.lock
+
+# Build output
+dist/
+
+# Dependencies (not needed with npm: imports)
+node_modules/
+package-lock.json
+pnpm-lock.yaml
+package.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local

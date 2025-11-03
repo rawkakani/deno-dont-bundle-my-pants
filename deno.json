@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "lib": ["deno.window", "dom", "dom.iterable", "esnext"],
+    "strict": true
+  },
+  "imports": {
+    "react": "npm:react@19.2.0",
+    "react/jsx-runtime": "npm:react@19.2.0/jsx-runtime",
+    "react-dom": "npm:react-dom@19.2.0",
+    "react-dom/server": "npm:react-dom@19.2.0/server",
+    "react-dom/client": "npm:react-dom@19.2.0/client",
+    "@ark-ui/react": "npm:@ark-ui/react@5.27.0",
+    "@ark-ui/react/factory": "npm:@ark-ui/react@5.27.0/factory",
+    "@ark-ui/react/field": "npm:@ark-ui/react@5.27.0/field",
+    "styled-system/jsx": "./styled-system/jsx/index.mjs",
+    "styled-system/css": "./styled-system/css/index.mjs",
+    "styled-system/recipes": "./styled-system/recipes/index.mjs",
+    "styled-system/types": "./styled-system/types/index.d.ts"
+  },
+  "tasks": {
+    "prepare": "deno task css",
+    "dev": "deno task prepare && deno run -A --unstable-bundle --watch server.tsx",
+    "build": "deno task css",
+    "css": "deno run -A scripts/build-css.ts",
+    "start": "deno run -A server.tsx"
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": false,
+    "proseWrap": "preserve"
+  }
+}
