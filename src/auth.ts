@@ -193,14 +193,14 @@ export function createAuth(config: AuthConfig) {
    * @returns Response with cleared cookie
    */
   async function handleLogout(request: Request): Promise<Response> {
-    const token = getCookie(request.headers, "auth_token");
+    const userId = getCookie(request.headers, "id");
     
-    if (token) {
-      await deleteSession(token);
+    if (userId) {
+      await deleteSession(userId);
     }
 
     const headers = new Headers();
-    setCookie(headers, "auth_token", "", {
+    setCookie(headers, "id", "", {
       expires: new Date(0) // Set to past date to delete cookie
     });
 

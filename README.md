@@ -1,123 +1,123 @@
-# Linkage
+# Modern SSR React Template
 
-A modern Server-Side Rendered (SSR) React application built with Deno, React 18+, and Tailwind CSS, featuring island architecture support.
+A production-ready Server-Side Rendered React application built with Deno, featuring authentication, modern styling, and accessible components.
 
-## Features
+## ✨ Features
 
-- ? **Fast SSR** with Deno.serve
-- ?? **Panda CSS** for modern styling
-- ??? **Deno KV Authentication** with session management
-- ?? **React 19+** with modern hydration
-- ?? **Native Bundling** using Deno
-- ?? **Hot Reload** in development
-- ?? **External OAuth Integration** (localhost:8000 / yangu.space)
+- **🚀 Server-Side Rendering (SSR)** with React 19 for optimal performance
+- **🎨 Modern Styling** with Panda CSS and design tokens
+- **♿ Accessible Components** with Ark UI primitives
+- **🔐 Complete Authentication System** with Deno KV sessions
+- **⚡ On-Demand Bundling** with Deno's native bundler
+- **🔒 TypeScript** for full type safety
+- **📱 Responsive Design** with mobile-first approach
+- **🔄 Hot Reload** in development mode
 
-## Getting Started
+## 🚀 Quick Start
 
-### Prerequisites
+1. **Clone and setup:**
+   ```bash
+   git clone <repository-url>
+   cd <project-name>
+   ```
 
-- [Deno](https://deno.land/) 1.40+ installed (with Node.js compatibility enabled)
+2. **Start development server:**
+   ```bash
+   deno task dev
+   ```
 
-### Installation
+3. **Open your browser:**
+   Navigate to http://localhost:8999
 
-Clone the repository and install dependencies:
-
-```bash
-git clone <repository-url>
-cd linkage
-```
-
-### Development
-
-Start the development server with hot reload:
-
-```bash
-deno task dev
-```
-
-The server will start at `http://localhost:8999`
-
-### Building for Production
-
-Build all assets:
+## 🛠️ Development Commands
 
 ```bash
-deno task build
+deno task dev      # Start dev server with hot reload
+deno task build    # Build CSS for production
+deno task start    # Start production server
+deno task css      # Generate Panda CSS styles
 ```
 
-This will:
-- Bundle the server code
-- Bundle the client code
-- Build and minify CSS
+## 🏗️ Architecture
 
-### Running Production Build
+### Core Technologies
+- **Deno 2.4+** - Modern JavaScript runtime and HTTP server
+- **React 19.2.0** - Latest React with SSR and concurrent features
+- **Panda CSS** - Modern CSS-in-JS with design tokens and atomic CSS
+- **Ark UI** - Unstyled, accessible component primitives
+- **Deno KV** - Distributed key-value database for sessions
 
-```bash
-deno task start
+### Key Features
+- **Authentication Flow**: Complete OAuth integration with subtle loading states
+- **Component System**: Reusable UI components with consistent styling
+- **Type Safety**: Full TypeScript coverage with strict mode
+- **Performance**: On-demand bundling and atomic CSS generation
+- **Accessibility**: WCAG compliant components with keyboard navigation
+
+## 📁 Project Structure
+
+```
+├── server.tsx              # Main Deno server with SSR
+├── deno.json              # Deno configuration and tasks
+├── src/
+│   ├── app.tsx           # Root React component
+│   ├── client.tsx        # Client hydration
+│   ├── pages/            # Page components
+│   ├── components/       # Reusable UI components
+│   └── auth.ts          # Authentication system
+├── styled-system/        # Auto-generated Panda CSS output
+├── scripts/             # Build and utility scripts
+└── panda.config.js       # Panda CSS configuration
 ```
 
-## Project Structure
+## 🔧 Configuration
 
-```
-linkage/
-??? server.tsx              # Main Deno server
-??? deno.json              # Deno configuration
-??? src/
-?   ??? app.tsx            # Root React component
-?   ??? client.tsx         # Client hydration entry
-?   ??? pages/             # Page components
-?   ??? islands/           # Island components
-?   ??? styles.css         # Tailwind CSS
-??? scripts/               # Build scripts
-??? dist/                  # Build output
-```
+### Environment Variables
+- `PORT` - Server port (default: 8999)
+- `COOKIE_DOMAIN` - Cookie domain for production
+- `AUTH_PROVIDER_URL` - External authentication provider
 
-## Available Tasks
+### Authentication Setup
+1. Configure your auth provider URL in environment
+2. Update cookie domain for production
+3. Customize user data storage as needed
 
-- `deno task dev` - Start development server with watch mode
-- `deno task build` - Build CSS assets for production
-- `deno task start` - Start production server
-- `deno run -A test-auth.ts` - Test authentication flow
+## 📚 Documentation
 
-## Authentication
+- **[agent.md](./agent.md)** - Comprehensive development guide
+- **[Panda CSS Docs](https://panda-css.com/)** - Styling system documentation
+- **[Ark UI Docs](https://ark-ui.com/)** - Component primitives
+- **[Deno Docs](https://docs.deno.com/)** - Runtime and server documentation
 
-The application includes a complete authentication system:
+## 🚀 Deployment
 
-### Authentication Flow
-1. **Login**: User clicks login button or accesses protected route → redirects to external provider with full current URL
-2. **Callback**: Provider redirects back with `?token=xxx&redirect=fullUrl` → validates and creates session
-3. **Session**: HTTP-only cookie stores auth token for 24 hours
-4. **Protected Routes**: All routes except `/` require authentication with full URL preservation
+### Production Deployment
+1. Set environment variables
+2. Run `deno task build`
+3. Start with `deno task start`
+4. Configure reverse proxy (nginx/caddy) if needed
 
-### Environment Configuration
-- **Development**: Uses `http://localhost:8000` as auth provider
-- **Production**: Uses `https://yangu.space` as auth provider
-- **Storage**: Deno KV with in-memory fallback
-
-### Testing
-Run authentication test suite:
-```bash
-deno run -A test-auth.ts
+### Docker Support
+```dockerfile
+FROM denoland/deno:2.4
+WORKDIR /app
+COPY . .
+EXPOSE 8999
+CMD ["run", "--allow-net", "--allow-env", "--allow-read", "--allow-write", "server.tsx"]
 ```
 
-Test full URL redirect functionality:
-```bash
-deno run -A test-full-url-redirect.ts
-```
+## 🤝 Contributing
 
-## Technologies
+1. Follow existing code patterns and architecture
+2. Update documentation for new features
+3. Ensure TypeScript compliance
+4. Test both SSR and client-side functionality
+5. Maintain accessibility standards
 
-- **Deno 2.4+** - Runtime and server framework
-- **React 19.2.0** - UI library with SSR support
-- **Panda CSS** - Modern CSS-in-JS with design tokens
-- **Ark UI** - Accessible component primitives
-- **Deno KV** - Key-value database for session storage
-- **TypeScript** - Type safety
+## 📄 License
 
-## License
+MIT License - feel free to use this template for your projects!
 
-MIT
+---
 
-## Contributing
-
-See [agent.md](./agent.md) for detailed documentation on how to contribute and extend this project.
+**Built with ❤️ using modern web technologies**

@@ -196,13 +196,10 @@ async function handler(req: Request): Promise<Response> {
     console.log(`  - User Name: ${user?.name || 'N/A'}`);
   }
 
-  // If user is not authenticated, redirect to login (except for auth routes)
+  // If user is not authenticated, show loader (except for auth routes)
   const isAuthRoute = url.pathname.startsWith('/auth/');
   
-  if (!user && !isAuthRoute) {
-    const loginUrl = `${url.origin}/auth/login?redirect=${encodeURIComponent(url.pathname)}`;
-    return Response.redirect(loginUrl, 302);
-  }
+  // Don't redirect - let the client-side loader handle it
 
   // Render app with user data
   const body = renderToString(<App user={user || undefined} path={url.pathname} />);

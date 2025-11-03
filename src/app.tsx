@@ -1,4 +1,4 @@
-import { LoginPage } from "./pages/login.tsx";
+import { AuthLoader } from "./components/auth-loader.tsx";
 import { DashboardPage } from "./pages/dashboard.tsx";
 
 interface AppProps {
@@ -16,10 +16,11 @@ interface AppProps {
  * @param path - Current path for routing
  */
 export function App({ user, path }: AppProps = {}) {
-  // If user is authenticated, show dashboard, otherwise show login
+  // If user is authenticated, show dashboard
   if (user) {
     return <DashboardPage user={user} />;
   }
   
-  return <LoginPage />;
+  // Show loader while checking authentication and redirect to login
+  return <AuthLoader message="Checking authentication..." />;
 }
