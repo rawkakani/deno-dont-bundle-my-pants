@@ -1,5 +1,6 @@
 import { renderToString } from "react-dom/server";
 import { App } from "./src/app.tsx";
+import { createAuth, getDefaultConfig } from "./src/auth.ts";
 
 // HTML template
 const htmlTemplate = `<!DOCTYPE html>
@@ -114,6 +115,15 @@ function transformImports(code: string): string {
 async function handler(req: Request): Promise<Response> {
   const url = new URL(req.url);
   
+  // Get auth instance for this host
+  const host = url.host;
+  const auth = await getAuthForHost(host);
+  
+  // Logout route
+  if (auth && url.pathname === '/auth/logout') {
+    return await auth.handleLogout(req);
+  }
+  
   // Static files (handle both absolute and relative paths)
   if (url.pathname === '/styles.css' || url.pathname === 'styles.css' || url.pathname.endsWith('/styles.css')) {
     return await staticFile('./dist/styles.css') || new Response('/* CSS not built */', {
@@ -176,15 +186,47 @@ async function handler(req: Request): Promise<Response> {
     }
   }
   
-  // SSR - render and return HTML
-  const body = renderToString(<App />);
+  // SSR - check if user is authenticated
+  let user = null;
+  if (auth) {
+    user = await auth.requireAuth(req);
+    console.log(`🔐 Authentication check for ${url.pathname}:`);
+    console.log(`  - User found: ${user ? 'YES' : 'NO'}`);
+    console.log(`  - User ID: ${user?.id || 'N/A'}`);
+    console.log(`  - User Name: ${user?.name || 'N/A'}`);
+  }
+
+  // If user is not authenticated, redirect to login (except for auth routes)
+  const isAuthRoute = url.pathname.startsWith('/auth/');
+  
+  if (!user && !isAuthRoute) {
+    const loginUrl = `${url.origin}/auth/login?redirect=${encodeURIComponent(url.pathname)}`;
+    return Response.redirect(loginUrl, 302);
+  }
+
+  // Render app with user data
+  const body = renderToString(<App user={user || undefined} path={url.pathname} />);
   const html = getHTML(body);
   return new Response(html, {
     headers: { 'content-type': 'text/html; charset=utf-8' },
   });
 }
 
+// Authentication cache by host
+const authInstances = new Map<string, ReturnType<typeof createAuth>>();
+
+// Get or create auth instance for specific host
+async function getAuthForHost(requestHost: string) {
+  if (!authInstances.has(requestHost)) {
+    const config = await getDefaultConfig(requestHost);
+    const auth = createAuth(config);
+    authInstances.set(requestHost, auth);
+  }
+  return authInstances.get(requestHost)!;
+}
+
 // Start server
 const port = Number(Deno.env.get("PORT")) || 8999;
-console.log(`🚀 Server running at http://localhost:${port}`);
+
+
 Deno.serve({ port }, handler);

@@ -307,22 +307,58 @@ The server automatically transforms imports for browser compatibility:
 
 ## Common Tasks
 
-### Adding Authentication
+### Authentication System
 
-1. Create API routes in `server.tsx`:
-   ```tsx
-   if (url.pathname === "/api/login" && req.method === "POST") {
-     const body = await req.json();
-     // Handle login logic
-     return new Response(JSON.stringify({ success: true }), {
-       headers: { "content-type": "application/json" },
-     });
-   }
-   ```
+The application uses **Deno KV** for session management with external OAuth provider integration:
 
-2. Update login page to call API
-3. Add session management (cookies/JWT)
-4. Protect routes server-side
+#### Authentication Flow
+
+1. **Login Initiation** (`/auth/login`):
+   - User clicks login button or accesses protected route
+   - Server captures current full URL (including path and query params)
+   - Redirects to external auth provider (localhost:8000 or yangu.space)
+   - Passes complete `redirect` URL for post-auth return
+
+2. **Authentication Callback** (`/auth/callback`):
+   - External provider redirects back with `?token=xxx&redirect=fullUrl`
+   - Server validates token with external API
+   - Creates user session in Deno KV
+   - Sets HTTP-only auth cookie
+   - Redirects to exact original URL (preserves path and query parameters)
+
+3. **Session Validation**:
+   - Protected routes validate auth token cookie
+   - Sessions expire after 24 hours (configurable)
+   - Automatic cleanup of expired sessions
+   - Unauthenticated users redirected to login with current URL preserved
+
+#### Key Components
+
+- **`src/auth.ts`**: Complete authentication system with Deno KV
+- **`src/pages/login.tsx`**: Simple login page with single button
+- **`server.tsx`**: Auth routes and middleware
+
+#### Authentication Routes
+
+- `GET /auth/login` - Redirect to external provider
+- `GET /auth/callback?token=xxx&redirect=/path` - Handle auth callback
+- `GET /auth/logout` - Clear session and redirect
+
+#### Environment Configuration
+
+- **Development**: Uses `http://localhost:8000` as auth provider
+- **Production**: Uses `https://yangu.space` as auth provider
+- **Cookie Settings**: HTTP-only, secure in production, 24-hour expiry
+
+#### Protected Routes
+
+Any route other than `/` requires authentication. Unauthenticated users are redirected to login with their current full URL preserved in the redirect parameter, ensuring they return to exactly where they started after authentication.
+
+#### User Data Storage
+
+- Users stored in KV under `["user", userId]`
+- Sessions stored in KV under `["session", token]`
+- Mock user API for development (replace with real API)
 
 ### Adding Routing
 

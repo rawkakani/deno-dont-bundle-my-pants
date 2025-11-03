@@ -5,11 +5,12 @@ A modern Server-Side Rendered (SSR) React application built with Deno, React 18+
 ## Features
 
 - ? **Fast SSR** with Deno.serve
-- ?? **Tailwind CSS** for styling
-- ??? **Island Architecture** for selective hydration
-- ?? **React 18+** with modern hydration
+- ?? **Panda CSS** for modern styling
+- ??? **Deno KV Authentication** with session management
+- ?? **React 19+** with modern hydration
 - ?? **Native Bundling** using Deno
 - ?? **Hot Reload** in development
+- ?? **External OAuth Integration** (localhost:8000 / yangu.space)
 
 ## Getting Started
 
@@ -74,18 +75,43 @@ linkage/
 ## Available Tasks
 
 - `deno task dev` - Start development server with watch mode
-- `deno task build` - Build all assets for production
-- `deno task bundle` - Bundle server and client code
-- `deno task bundle:server` - Bundle server code only
-- `deno task bundle:client` - Bundle client code only
-- `deno task build:css` - Build CSS with Tailwind
+- `deno task build` - Build CSS assets for production
 - `deno task start` - Start production server
+- `deno run -A test-auth.ts` - Test authentication flow
+
+## Authentication
+
+The application includes a complete authentication system:
+
+### Authentication Flow
+1. **Login**: User clicks login button or accesses protected route → redirects to external provider with full current URL
+2. **Callback**: Provider redirects back with `?token=xxx&redirect=fullUrl` → validates and creates session
+3. **Session**: HTTP-only cookie stores auth token for 24 hours
+4. **Protected Routes**: All routes except `/` require authentication with full URL preservation
+
+### Environment Configuration
+- **Development**: Uses `http://localhost:8000` as auth provider
+- **Production**: Uses `https://yangu.space` as auth provider
+- **Storage**: Deno KV with in-memory fallback
+
+### Testing
+Run authentication test suite:
+```bash
+deno run -A test-auth.ts
+```
+
+Test full URL redirect functionality:
+```bash
+deno run -A test-full-url-redirect.ts
+```
 
 ## Technologies
 
-- **Deno** - Runtime and server framework
-- **React 18+** - UI library with SSR support
-- **Tailwind CSS 4.1** - Utility-first CSS framework (via PostCSS)
+- **Deno 2.4+** - Runtime and server framework
+- **React 19.2.0** - UI library with SSR support
+- **Panda CSS** - Modern CSS-in-JS with design tokens
+- **Ark UI** - Accessible component primitives
+- **Deno KV** - Key-value database for session storage
 - **TypeScript** - Type safety
 
 ## License
