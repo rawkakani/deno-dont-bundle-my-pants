@@ -39,7 +39,7 @@ export function DashboardPage({ user }: DashboardPageProps) {
 
   const fetchConnectedAccounts = async () => {
     try {
-      const response = await fetch('/api/zoho/accounts');
+      const response = await fetch('api/zoho/accounts');
       if (response.ok) {
         const accounts = await response.json();
         setConnectedAccounts(accounts);
@@ -51,11 +51,11 @@ export function DashboardPage({ user }: DashboardPageProps) {
 
   const handleConnectZoho = () => {
     // Redirect to Zoho OAuth
-    window.location.href = '/api/zoho/connect';
+    window.location.href = 'api/zoho/connect';
   };
 
   const handleLogout = () => {
-    window.location.href = "/auth/logout";
+    window.location.href = "auth/logout";
   };
 
   return (
@@ -65,7 +65,7 @@ export function DashboardPage({ user }: DashboardPageProps) {
       display: "flex",
       flexDirection: "column"
     })}>
-      <div className={css({ maxWidth: "1200px", margin: "0 auto", padding: "2rem", flex: 1, display: "flex", flexDirection: "column" })}>
+      <div className={css({ width: "full", padding: "2rem", flex: 1, display: "flex", flexDirection: "column" })}>
         {/* Top Bar */}
         <div className={css({
           display: "flex",
