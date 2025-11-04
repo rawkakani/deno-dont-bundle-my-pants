@@ -212,9 +212,9 @@ async function handler(req: Request): Promise<Response> {
     console.log(`🌐 Yangu URL from .env: ${yanguUrl}`);
     if (yanguUrl) {
       try {
-        console.log(`📡 Fetching user data from: ${yanguUrl}/api/user`);
-        const response = await fetch(yanguUrl + "/api/user", {
-          headers: { "X-User-Id": token }
+        console.log(`📡 Fetching user data from: ${yanguUrl}`);
+        const response = await fetch(yanguUrl + `/api/user`, {
+          headers: { "x-userid": token }
         });
         console.log(`📡 Response status: ${response.status}`);
         if (response.ok) {
