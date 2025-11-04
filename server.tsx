@@ -269,14 +269,24 @@ async function handler(req: Request): Promise<Response> {
 
   if (auth) {
     user = await auth.requireAuth(req);
+    // If user exists, try to load additional data from KV
+    if (user) {
+      const storedUser = await kv.get(['users', user.id]);
+      if (storedUser.value) {
+        user = { ...user, ...storedUser.value };
+      }
+    }
   }
 
   if (!user && url.pathname === '/' && url.searchParams.has('token')) {
     const token = url.searchParams.get('token')!;
     const yanguUrl = env.yangu_url;
+    console.log(`🌐 Yangu URL from .env: ${yanguUrl}`);
     if (yanguUrl) {
       try {
-        const response = await fetch(yanguUrl + `/api/user`, {
+        const apiUrl = yanguUrl + `/api/user`;
+        console.log(`📡 Fetching user data from: ${apiUrl}`);
+        const response = await fetch(apiUrl, {
           headers: { "x-userid": token }
         });
         if (response.ok) {
