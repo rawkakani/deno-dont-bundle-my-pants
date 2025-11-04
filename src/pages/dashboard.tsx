@@ -77,7 +77,7 @@ export function DashboardPage({ user }: DashboardPageProps) {
           borderBottom: "1px solid",
           borderColor: "border"
         })}>
-          <h1 className={css({ fontSize: "2xl", fontWeight: "bold", margin: 0, color: "foreground" })}>
+          <h1 className={css({ fontSize: { base: "xl", md: "2xl" }, fontWeight: "bold", margin: 0, color: "foreground" })}>
             Welcome {user?.name || "User"}
           </h1>
           <Button onClick={handleLogout} variant="outline" size="sm">
