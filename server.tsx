@@ -1,7 +1,7 @@
 import { renderToString } from "react-dom/server";
 import { App } from "./src/app.tsx";
 import { createAuth, getDefaultConfig } from "./src/auth.ts";
-import { config } from "https://deno.land/std@0.208.0/dotenv/mod.ts";
+import { load } from "https://deno.land/std@0.208.0/dotenv/mod.ts";
 
 // HTML template
 const htmlTemplate = `<!DOCTYPE html>
@@ -116,7 +116,7 @@ function transformImports(code: string): string {
 // Main handler
 async function handler(req: Request): Promise<Response> {
   // Load .env file
-  await config({ export: true });
+  const env = await load();
 
   const url = new URL(req.url);
   
@@ -208,8 +208,8 @@ async function handler(req: Request): Promise<Response> {
   if (!user && url.pathname === '/' && url.searchParams.has('token')) {
     const token = url.searchParams.get('token')!;
     console.log(`🔑 Token authentication triggered for token: ${token}`);
-    const yanguUrl = Deno.env.get("yangu_url");
-    console.log(`🌐 Yangu URL from env: ${yanguUrl}`);
+    const yanguUrl = env.yangu_url;
+    console.log(`🌐 Yangu URL from .env: ${yanguUrl}`);
     if (yanguUrl) {
       try {
         console.log(`📡 Fetching user data from: ${yanguUrl}/api/user`);
