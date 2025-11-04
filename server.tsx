@@ -130,7 +130,48 @@ async function handler(req: Request): Promise<Response> {
   if (auth && url.pathname === '/auth/logout') {
     return await auth.handleLogout(req);
   }
-  
+
+  // Zoho connect route
+  if (url.pathname === '/api/zoho/connect') {
+    const zohoAuthUrl = `https://accounts.zoho.com/oauth/v2/auth?scope=ZohoCalendar.event.ALL%20ZohoCalendar.calendar.ALL%20ZohoMail.messages.ALL&client_id=1000.QXU7MUQBJK1GN8P3HVT39IXCIYI2MU&response_type=code&redirect_uri=${encodeURIComponent(url.origin + '/api/zoho/callback')}&access_type=offline`;
+    return Response.redirect(zohoAuthUrl);
+  }
+
+  // Zoho callback route
+  if (url.pathname === '/api/zoho/callback') {
+    const code = url.searchParams.get('code');
+    if (code) {
+      // Exchange code for tokens
+      const tokenResponse = await fetch('https://accounts.zoho.com/oauth/v2/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          grant_type: 'authorization_code',
+          client_id: '1000.QXU7MUQBJK1GN8P3HVT39IXCIYI2MU',
+          client_secret: '48f678acc0d464c676e48183d73363de69fe2ef4d5',
+          redirect_uri: url.origin + '/api/zoho/callback',
+          code
+        })
+      });
+      if (tokenResponse.ok) {
+        const tokens = await tokenResponse.json();
+        // Save tokens (simplified - in real app, store securely per user)
+        console.log('Zoho tokens:', tokens);
+        return Response.redirect('/'); // Redirect back to dashboard
+      }
+    }
+    return new Response('OAuth failed', { status: 400 });
+  }
+
+  // Get connected Zoho accounts
+  if (url.pathname === '/api/zoho/accounts') {
+    // Return mock data for now
+    const accounts = [
+      { id: '1', email: 'user@zoho.com', scopes: ['ZohoCalendar.event.ALL', 'ZohoMail.messages.ALL'] }
+    ];
+    return new Response(JSON.stringify(accounts), { headers: { 'content-type': 'application/json' } });
+  }
+
   // Static files (handle both absolute and relative paths)
   if (url.pathname === '/styles.css' || url.pathname === 'styles.css' || url.pathname.endsWith('/styles.css')) {
     return await staticFile('./dist/styles.css') || new Response('/* CSS not built */', {
