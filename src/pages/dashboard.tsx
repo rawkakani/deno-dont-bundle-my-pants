@@ -26,6 +26,15 @@ export function DashboardPage({ user }: DashboardPageProps) {
   useEffect(() => {
     // Fetch connected Zoho accounts
     fetchConnectedAccounts();
+
+    // Check if redirected from Zoho connection
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('zoho_connected')) {
+      // Clean URL
+      window.history.replaceState({}, '', window.location.pathname);
+      // Refresh accounts
+      fetchConnectedAccounts();
+    }
   }, []);
 
   const fetchConnectedAccounts = async () => {

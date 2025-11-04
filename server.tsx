@@ -157,7 +157,7 @@ async function handler(req: Request): Promise<Response> {
         const tokens = await tokenResponse.json();
         // Save tokens (simplified - in real app, store securely per user)
         console.log('Zoho tokens:', tokens);
-        return Response.redirect('/'); // Redirect back to dashboard
+        return Response.redirect('/?zoho_connected=1'); // Redirect back to dashboard with flag
       }
     }
     return new Response('OAuth failed', { status: 400 });
