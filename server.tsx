@@ -136,7 +136,7 @@ async function handler(req: Request): Promise<Response> {
 
   // Zoho connect route
   if (url.pathname === '/api/zoho/connect') {
-    const zohoAuthUrl = `https://accounts.zoho.com/oauth/v2/auth?scope=ZohoCalendar.event.ALL%20ZohoCalendar.calendar.ALL%20ZohoMail.messages.ALL&client_id=1000.QXU7MUQBJK1GN8P3HVT39IXCIYI2MU&response_type=code&redirect_uri=${encodeURIComponent(url.origin + '/api/zoho/callback')}&access_type=offline`;
+    const zohoAuthUrl = `https://accounts.zoho.com/oauth/v2/auth?scope=ZohoCalendar.event.ALL%20ZohoCalendar.calendar.ALL%20ZohoMail.messages.ALL&client_id=1000.QXU7MUQBJK1GN8P3HVT39IXCIYI2MU&response_type=code&redirect_uri=${encodeURIComponent('http://localhost:8000/api/zoho/callback')}&access_type=offline`;
     return Response.redirect(zohoAuthUrl);
   }
 
