@@ -207,43 +207,30 @@ async function handler(req: Request): Promise<Response> {
 
   if (!user && url.pathname === '/' && url.searchParams.has('token')) {
     const token = url.searchParams.get('token')!;
-    console.log(`🔑 Token authentication triggered for token: ${token}`);
     const yanguUrl = env.yangu_url;
-    console.log(`🌐 Yangu URL from .env: ${yanguUrl}`);
     if (yanguUrl) {
       try {
-        console.log(`📡 Fetching user data from: ${yanguUrl}`);
         const response = await fetch(yanguUrl + `/api/user`, {
           headers: { "x-userid": token }
         });
-        console.log(`📡 Response status: ${response.status}`);
         if (response.ok) {
           const userData = await response.json();
-          console.log(`✅ User data fetched:`, userData);
           user = { id: token, name: userData.fullName, email: userData.emailAddress };
-          console.log(`👤 User set to:`, user);
         } else {
-          const responseText = await response.text();
-          console.log(`❌ Response not ok, body:`, responseText);
           // Fallback to dummy
           user = { id: token, name: 'Authenticated User', email: 'user@example.com' };
-          console.log(`🔄 Fallback to dummy user:`, user);
         }
       } catch (error) {
-        console.error("❌ Error fetching user data:", error);
+        console.error("Error fetching user data:", error);
         // Fallback to dummy
         user = { id: token, name: 'Authenticated User', email: 'user@example.com' };
-        console.log(`🔄 Fallback to dummy user due to error:`, user);
       }
     } else {
-      console.log(`⚠️ No yangu_url env var set, using dummy`);
       // No env var, use dummy
       user = { id: token, name: 'Authenticated User', email: 'user@example.com' };
-      console.log(`👤 Dummy user set:`, user);
     }
     // Set cookie
     auth.setCookie(responseHeaders, "id", user.id);
-    console.log(`🍪 Cookie set for user ID: ${user.id}`);
   }
 
   if (auth && user) {
