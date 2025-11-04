@@ -13,13 +13,14 @@ const htmlTemplate = `<!DOCTYPE html>
 </head>
 <body>
   <div id="root">{{BODY}}</div>
+  <script>window.__INITIAL_DATA__ = {{INITIAL_DATA}};</script>
   <script src="client.js" type="module"></script>
 </body>
 </html>`;
 
 // Function to get HTML with SSR body
-function getHTML(body: string): string {
-  return htmlTemplate.replace('{{BODY}}', body);
+function getHTML(body: string, initialData: string): string {
+  return htmlTemplate.replace('{{BODY}}', body).replace('{{INITIAL_DATA}}', initialData);
 }
 
 // Static file handler
@@ -119,6 +120,8 @@ async function handler(req: Request): Promise<Response> {
   const host = url.host;
   const auth = await getAuthForHost(host);
   
+
+  
   // Logout route
   if (auth && url.pathname === '/auth/logout') {
     return await auth.handleLogout(req);
@@ -186,10 +189,27 @@ async function handler(req: Request): Promise<Response> {
     }
   }
   
-  // SSR - check if user is authenticated
+  // Determine redirect host based on environment
+  const isProduction = Deno.env.get("NODE_ENV") === "production";
+  const redirectHost = isProduction ? "https://yangu.space" : "http://localhost:8000";
+
+  // Handle token authentication at root
   let user = null;
+  let responseHeaders = new Headers();
+
   if (auth) {
     user = await auth.requireAuth(req);
+  }
+
+  if (!user && url.pathname === '/' && url.searchParams.has('token')) {
+    const token = url.searchParams.get('token')!;
+    // Dummy: get user from token
+    user = { id: token, name: 'Authenticated User', email: 'user@example.com' };
+    // Set cookie
+    auth.setCookie(responseHeaders, "id", user.id);
+  }
+
+  if (auth && user) {
     console.log(`🔐 Authentication check for ${url.pathname}:`);
     console.log(`  - User found: ${user ? 'YES' : 'NO'}`);
     console.log(`  - User ID: ${user?.id || 'N/A'}`);
@@ -198,15 +218,21 @@ async function handler(req: Request): Promise<Response> {
 
   // If user is not authenticated, show loader (except for auth routes)
   const isAuthRoute = url.pathname.startsWith('/auth/');
-  
+
   // Don't redirect - let the client-side loader handle it
 
-  // Render app with user data
-  const body = renderToString(<App user={user || undefined} path={url.pathname} />);
-  const html = getHTML(body);
-  return new Response(html, {
-    headers: { 'content-type': 'text/html; charset=utf-8' },
-  });
+  // Render app with user data and current host
+  const body = renderToString(<App user={user || undefined} path={url.pathname} currentHost={url.host} redirectHost={redirectHost} />);
+  const initialData = JSON.stringify({ user, path: url.pathname, currentHost: url.host, redirectHost });
+  const html = getHTML(body, initialData);
+
+  // Merge headers
+  const finalHeaders = new Headers({ 'content-type': 'text/html; charset=utf-8' });
+  for (const [key, value] of responseHeaders.entries()) {
+    finalHeaders.set(key, value);
+  }
+
+  return new Response(html, { headers: finalHeaders });
 }
 
 // Authentication cache by host

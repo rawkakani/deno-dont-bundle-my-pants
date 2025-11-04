@@ -56,46 +56,46 @@ export function DashboardPage({ user }: DashboardPageProps) {
             <Card.Header>
               <Card.Title>User Profile</Card.Title>
             </Card.Header>
-            <Card.Body>
-              <Text size="sm" color="fg.muted">
-                <div style={{ marginBottom: "0.5rem" }}>
-                  <strong>Name:</strong> {user?.name || "N/A"}
-                </div>
-                <div style={{ marginBottom: "0.5rem" }}>
-                  <strong>Email:</strong> {user?.email || "N/A"}
-                </div>
-                <div>
-                  <strong>ID:</strong> {user?.id || "N/A"}
-                </div>
-              </Text>
-            </Card.Body>
+             <Card.Body>
+               <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>
+                 <div style={{ marginBottom: "0.5rem" }}>
+                   <strong>Name:</strong> {user?.name || "N/A"}
+                 </div>
+                 <div style={{ marginBottom: "0.5rem" }}>
+                   <strong>Email:</strong> {user?.email || "N/A"}
+                 </div>
+                 <div>
+                   <strong>ID:</strong> {user?.id || "N/A"}
+                 </div>
+               </div>
+             </Card.Body>
           </Card.Root>
 
           <Card.Root>
             <Card.Header>
               <Card.Title>Authentication Status</Card.Title>
             </Card.Header>
-            <Card.Body>
-              <Text size="sm" color="fg.muted">
-                <div style={{ 
-                  display: "flex", 
-                  alignItems: "center", 
-                  gap: "0.5rem",
-                  marginBottom: "0.5rem" 
-                }}>
-                  <div style={{ 
-                    width: "8px", 
-                    height: "8px", 
-                    borderRadius: "50%", 
-                    backgroundColor: "#10b981" 
-                  }} />
-                  Authenticated
-                </div>
-                <div>
-                  Session is active and valid
-                </div>
-              </Text>
-            </Card.Body>
+             <Card.Body>
+               <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>
+                 <div style={{
+                   display: "flex",
+                   alignItems: "center",
+                   gap: "0.5rem",
+                   marginBottom: "0.5rem"
+                 }}>
+                   <div style={{
+                     width: "8px",
+                     height: "8px",
+                     borderRadius: "50%",
+                     backgroundColor: "#10b981"
+                   }} />
+                   Authenticated
+                 </div>
+                 <div>
+                   Session is active and valid
+                 </div>
+               </div>
+             </Card.Body>
           </Card.Root>
 
           <Card.Root>

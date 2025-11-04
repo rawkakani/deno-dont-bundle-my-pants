@@ -5,11 +5,51 @@ import { Card } from "../components/ui/card.tsx";
  * Simple login page with a single login button
  * Redirects to external authentication provider
  */
-export function LoginPage() {
-  const handleLogin = () => {
-    // Redirect to authentication provider with current full URL as redirect
-    const currentUrl = window.location.href;
-    window.location.href = `/auth/login?redirect=${encodeURIComponent(currentUrl)}`;
+interface LoginPageProps {
+  currentHost?: string;
+}
+
+export function LoginPage({ currentHost }: LoginPageProps = {}) {
+  // Get redirect parameter from URL, default to '/'
+  // Handle SSR where globalThis.location might be undefined
+  let redirectPath = '/';
+  try {
+    if (globalThis.location?.search) {
+      const urlParams = new URLSearchParams(globalThis.location.search);
+      redirectPath = urlParams.get('redirect') || '/';
+    }
+  } catch {
+    // Fallback to default redirect during SSR
+    redirectPath = '/';
+  }
+  
+  // Build full redirect URL (host + path)
+  // Use currentHost from props if available, otherwise use current origin
+  const redirectUrl = globalThis.location ? 
+    `${currentHost ? `https://${currentHost}` : globalThis.location.origin}${redirectPath}` : 
+    redirectPath;
+  
+  const handleLogin = async () => {
+    if (typeof window !== 'undefined') {
+      // Show loading state
+      const button = document.querySelector('button');
+      if (button) {
+        button.textContent = 'Logging in...';
+        button.disabled = true;
+      }
+      
+      // Simulate word-by-word delay (2 seconds per word for reading time)
+      const words = ['Preparing', 'your', 'magical', 'journey'];
+      for (const word of words) {
+        if (button) {
+          button.textContent = `${word}...`;
+        }
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+      
+      // Redirect to authentication provider with the full redirect URL
+      window.location.href = `/auth/login?redirect=${encodeURIComponent(redirectUrl)}`;
+    }
   };
 
   return (

@@ -120,6 +120,27 @@ export default {
             size: "md",
           },
         },
+        pulseLoader: {
+          className: "pulse-loader",
+          description: "A pulsing loader component",
+          base: {
+            borderRadius: "full",
+            bg: "colorPalette.default",
+            animation: "pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+          },
+          variants: {
+            size: {
+              xs: { width: "6", height: "6" },
+              sm: { width: "8", height: "8" },
+              md: { width: "10", height: "10" },
+              lg: { width: "12", height: "12" },
+              xl: { width: "16", height: "16" },
+            },
+          },
+          defaultVariants: {
+            size: "lg",
+          },
+        },
         input: {
           className: "input",
           description: "An input component",
@@ -309,6 +330,10 @@ export default {
         spin: {
           "0%": { transform: "rotate(0deg)" },
           "100%": { transform: "rotate(360deg)" },
+        },
+        pulse: {
+          "0%, 100%": { opacity: 0.8, transform: "scale(1)" },
+          "50%": { opacity: 0.4, transform: "scale(1.1)" },
         },
       },
     },
