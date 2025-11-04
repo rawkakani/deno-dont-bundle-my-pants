@@ -136,7 +136,7 @@ async function handler(req: Request): Promise<Response> {
 
   // Zoho connect route
   if (url.pathname === '/api/zoho/connect') {
-    const zohoAuthUrl = `https://accounts.zoho.com/oauth/v2/auth?scope=ZohoCalendar.event.ALL%20ZohoCalendar.calendar.ALL%20ZohoMail.messages.ALL&client_id=1000.QXU7MUQBJK1GN8P3HVT39IXCIYI2MU&response_type=code&redirect_uri=${encodeURIComponent(env.zoho_redirect_uri)}&access_type=offline`;
+    const zohoAuthUrl = `https://accounts.zoho.com/oauth/v2/auth?scope=ZohoCalendar.event.ALL%20ZohoCalendar.calendar.ALL%20ZohoMail.messages.ALL&client_id=${env.zoho_client_id}&response_type=code&redirect_uri=${encodeURIComponent(env.zoho_redirect_uri)}&access_type=offline`;
     return Response.redirect(zohoAuthUrl);
   }
 
@@ -150,9 +150,9 @@ async function handler(req: Request): Promise<Response> {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
           grant_type: 'authorization_code',
-          client_id: '1000.QXU7MUQBJK1GN8P3HVT39IXCIYI2MU',
-          client_secret: '48f678acc0d464c676e48183d73363de69fe2ef4d5',
-          redirect_uri: url.origin + '/api/zoho/callback',
+          client_id: env.zoho_client_id,
+          client_secret: env.zoho_client_secret,
+          redirect_uri: env.zoho_redirect_uri,
           code
         })
       });
