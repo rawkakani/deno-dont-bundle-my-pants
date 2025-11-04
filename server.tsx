@@ -182,12 +182,18 @@ async function handler(req: Request): Promise<Response> {
 
   // Get connected Zoho accounts
   if (url.pathname === '/api/zoho/accounts') {
-    const userId = req.headers.get('cookie')?.split(';').find(c => c.trim().startsWith('id='))?.split('=')[1];
+    const cookies = req.headers.get('cookie');
+    console.log('Cookies received:', cookies);
+    const userId = cookies?.split(';').find(c => c.trim().startsWith('id='))?.split('=')[1];
+    console.log('Extracted userId:', userId);
     if (userId) {
       const accounts = await kv.get(['zoho_accounts', userId]);
+      console.log('KV accounts for user:', accounts.value);
       const data = Array.isArray(accounts.value) ? accounts.value : [];
+      console.log('Returning data:', data);
       return new Response(JSON.stringify(data), { headers: { 'content-type': 'application/json' } });
     }
+    console.log('No userId found, returning empty array');
     return new Response(JSON.stringify([]), { headers: { 'content-type': 'application/json' } });
   }
 
