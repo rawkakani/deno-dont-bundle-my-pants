@@ -203,8 +203,28 @@ async function handler(req: Request): Promise<Response> {
 
   if (!user && url.pathname === '/' && url.searchParams.has('token')) {
     const token = url.searchParams.get('token')!;
-    // Dummy: get user from token
-    user = { id: token, name: 'Authenticated User', email: 'user@example.com' };
+    const yanguUrl = Deno.env.get("yangu_url");
+    if (yanguUrl) {
+      try {
+        const response = await fetch(yanguUrl + "/api/user", {
+          headers: { "x-userid": token }
+        });
+        if (response.ok) {
+          const userData = await response.json();
+          user = { id: token, name: userData.fullName, email: userData.emailAddress };
+        } else {
+          // Fallback to dummy
+          user = { id: token, name: 'Authenticated User', email: 'user@example.com' };
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        // Fallback to dummy
+        user = { id: token, name: 'Authenticated User', email: 'user@example.com' };
+      }
+    } else {
+      // No env var, use dummy
+      user = { id: token, name: 'Authenticated User', email: 'user@example.com' };
+    }
     // Set cookie
     auth.setCookie(responseHeaders, "id", user.id);
   }
