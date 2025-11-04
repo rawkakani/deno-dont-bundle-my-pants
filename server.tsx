@@ -3,6 +3,9 @@ import { App } from "./src/app.tsx";
 import { createAuth, getDefaultConfig } from "./src/auth.ts";
 import { load } from "https://deno.land/std@0.208.0/dotenv/mod.ts";
 
+// Initialize Deno KV
+const kv = await Deno.openKv();
+
 // HTML template
 const htmlTemplate = `<!DOCTYPE html>
 <html lang="en">
@@ -155,8 +158,22 @@ async function handler(req: Request): Promise<Response> {
       });
       if (tokenResponse.ok) {
         const tokens = await tokenResponse.json();
-        // Save tokens (simplified - in real app, store securely per user)
-        console.log('Zoho tokens:', tokens);
+        // Get current user (assuming from cookie)
+        const userId = req.headers.get('cookie')?.split(';').find(c => c.trim().startsWith('id='))?.split('=')[1];
+        if (userId) {
+          // Save Zoho tokens for user
+          await kv.set(['zoho_tokens', userId], tokens);
+          // Add to connected accounts
+          const accountsKey = ['zoho_accounts', userId];
+          const existing = await kv.get(accountsKey);
+          const accounts = Array.isArray(existing.value) ? existing.value : [];
+          accounts.push({
+            id: crypto.randomUUID(),
+            email: 'connected@zoho.com', // In real app, fetch from Zoho API
+            scopes: ['ZohoCalendar.event.ALL', 'ZohoCalendar.calendar.ALL', 'ZohoMail.messages.ALL']
+          });
+          await kv.set(accountsKey, accounts);
+        }
         return Response.redirect('/?zoho_connected=1'); // Redirect back to dashboard with flag
       }
     }
@@ -165,11 +182,13 @@ async function handler(req: Request): Promise<Response> {
 
   // Get connected Zoho accounts
   if (url.pathname === '/api/zoho/accounts') {
-    // Return mock data for now
-    const accounts = [
-      { id: '1', email: 'user@zoho.com', scopes: ['ZohoCalendar.event.ALL', 'ZohoMail.messages.ALL'] }
-    ];
-    return new Response(JSON.stringify(accounts), { headers: { 'content-type': 'application/json' } });
+    const userId = req.headers.get('cookie')?.split(';').find(c => c.trim().startsWith('id='))?.split('=')[1];
+    if (userId) {
+      const accounts = await kv.get(['zoho_accounts', userId]);
+      const data = Array.isArray(accounts.value) ? accounts.value : [];
+      return new Response(JSON.stringify(data), { headers: { 'content-type': 'application/json' } });
+    }
+    return new Response(JSON.stringify([]), { headers: { 'content-type': 'application/json' } });
   }
 
   // Static files (handle both absolute and relative paths)
@@ -257,6 +276,9 @@ async function handler(req: Request): Promise<Response> {
         if (response.ok) {
           const userData = await response.json();
           user = { id: token, name: userData.fullName, email: userData.emailAddress };
+          // Save user data to KV
+          await kv.set(['users', token], user);
+          console.log(`👤 User set to:`, user);
         } else {
           // Fallback to dummy
           user = { id: token, name: 'Authenticated User', email: 'user@example.com' };
