@@ -59,8 +59,13 @@ export function DashboardPage({ user }: DashboardPageProps) {
   };
 
   return (
-    <div className={css({ minHeight: "100vh", padding: "2rem", backgroundColor: "gray.50" })}>
-      <div className={css({ maxWidth: "1200px", margin: "0 auto" })}>
+    <div className={css({
+      minHeight: "100vh",
+      backgroundColor: "background",
+      display: "flex",
+      flexDirection: "column"
+    })}>
+      <div className={css({ maxWidth: "1200px", margin: "0 auto", padding: "2rem", flex: 1, display: "flex", flexDirection: "column" })}>
         {/* Top Bar */}
         <div className={css({
           display: "flex",
@@ -68,14 +73,14 @@ export function DashboardPage({ user }: DashboardPageProps) {
           alignItems: "center",
           marginBottom: "2rem",
           padding: "1rem",
-          backgroundColor: "white",
-          borderRadius: "md",
-          boxShadow: "sm"
+          backgroundColor: "background",
+          borderBottom: "1px solid",
+          borderColor: "border"
         })}>
-          <h1 className={css({ fontSize: "2xl", fontWeight: "bold", margin: 0 })}>
+          <h1 className={css({ fontSize: "2xl", fontWeight: "bold", margin: 0, color: "foreground" })}>
             Welcome {user?.name || "User"}
           </h1>
-          <Button onClick={handleLogout} colorPalette="red">
+          <Button onClick={handleLogout} variant="outline" size="sm">
             Logout
           </Button>
         </div>
@@ -83,36 +88,25 @@ export function DashboardPage({ user }: DashboardPageProps) {
         {/* Connected Zoho Accounts */}
         <div className={css({
           display: "grid",
-          gridTemplateColumns: { base: "1fr", md: "repeat(auto-fit, minmax(300px, 1fr))" },
-          gap: "1.5rem"
+          gridTemplateColumns: { base: "1fr", md: "repeat(auto-fit, minmax(350px, 1fr))" },
+          gap: "1.5rem",
+          flex: 1,
+          marginBottom: { base: "5rem", md: "2rem" } // Space for fixed button on mobile
         })}>
-          {/* Connect Zoho Card */}
-          <div className={css({
-            backgroundColor: "white",
-            borderRadius: "md",
-            boxShadow: "sm",
-            padding: "1.5rem"
-          })}>
-            <h3 className={css({ fontSize: "lg", fontWeight: "semibold", marginBottom: "1rem" })}>
-              Connect to Zoho
-            </h3>
-            <Button onClick={handleConnectZoho} size="lg">
-              Connect Zoho Account
-            </Button>
-          </div>
-
           {/* Connected Accounts */}
           {connectedAccounts.map((account) => (
             <div key={account.id} className={css({
-              backgroundColor: "white",
-              borderRadius: "md",
+              backgroundColor: "card",
+              borderRadius: "lg",
+              border: "1px solid",
+              borderColor: "border",
               boxShadow: "sm",
               padding: "1.5rem"
             })}>
-              <h3 className={css({ fontSize: "lg", fontWeight: "semibold", marginBottom: "1rem" })}>
+              <h3 className={css({ fontSize: "lg", fontWeight: "semibold", marginBottom: "1rem", color: "card.foreground" })}>
                 Zoho Account
               </h3>
-              <div className={css({ fontSize: "sm", color: "gray.600" })}>
+              <div className={css({ fontSize: "sm", color: "muted.foreground" })}>
                 <div className={css({ marginBottom: "0.5rem" })}>
                   <strong>Email:</strong> {account.email}
                 </div>
@@ -122,6 +116,22 @@ export function DashboardPage({ user }: DashboardPageProps) {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Connect Zoho Button - Fixed at bottom on mobile */}
+        <div className={css({
+          position: { base: "fixed", md: "static" },
+          bottom: { base: 0, md: "auto" },
+          left: { base: 0, md: "auto" },
+          right: { base: 0, md: "auto" },
+          padding: { base: "1rem", md: 0 },
+          backgroundColor: { base: "background", md: "transparent" },
+          borderTop: { base: "1px solid", md: "none" },
+          borderColor: { base: "border", md: "transparent" }
+        })}>
+          <Button onClick={handleConnectZoho} className={css({ width: { base: "full", md: "auto" } })} size="lg">
+            Connect Zoho Account
+          </Button>
         </div>
       </div>
     </div>
